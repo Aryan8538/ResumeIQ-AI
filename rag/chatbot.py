@@ -63,7 +63,7 @@ def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[
         context_str = "No specific context could be retrieved from the resume or job description documents."
         
     # 2. Formulate system instruction with retrieved context
-    system_instruction = RAG_SYSTEM_PROMPT.format(context=context_str)
+    system_instruction = RAG_SYSTEM_PROMPT.replace("{context}", context_str)
     
     # 3. Format conversational history (keep last 6 turns to keep context brief and relevant)
     history_str = ""

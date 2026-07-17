@@ -76,7 +76,7 @@ def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
               strengths, weaknesses, and match_explanation.
     """
     logger.info("Performing Resume vs JD analysis...")
-    formatted_prompt = RESUME_VS_JD_PROMPT.format(resume_text=resume_text, jd_text=jd_text)
+    formatted_prompt = RESUME_VS_JD_PROMPT.replace("{resume_text}", resume_text).replace("{jd_text}", jd_text)
     try:
         response = client.models.generate_content(
             model="gemini-3.5-flash",
@@ -106,7 +106,7 @@ def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
         dict: containing lists of technical, behavioral, and HR questions with answer guides.
     """
     logger.info("Generating custom interview questions...")
-    formatted_prompt = INTERVIEW_QUESTIONS_PROMPT.format(resume_text=resume_text, jd_text=jd_text)
+    formatted_prompt = INTERVIEW_QUESTIONS_PROMPT.replace("{resume_text}", resume_text).replace("{jd_text}", jd_text)
     try:
         response = client.models.generate_content(
             model="gemini-3.5-flash",
