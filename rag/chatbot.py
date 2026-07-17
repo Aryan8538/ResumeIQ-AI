@@ -3,6 +3,7 @@ Chatbot service coordinating RAG (Retrieval-Augmented Generation) pipeline for R
 Retrieves context, formats conversational history, and calls Gemini with strict grounding guidelines.
 """
 import os
+import time
 import logging
 from dotenv import load_dotenv
 from google import genai
@@ -79,21 +80,27 @@ def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[
         contents.append(f"Recent Conversation History:\n{history_str}")
     contents.append(f"Recruiter's Current Question: {query}")
     
-    # 5. Generate content using Gemini 2.5 Flash
-    try:
-        logger.info("Calling Gemini 3.5 Flash for RAG grounded generation...")
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=0.2 # Lower temperature for factual accuracy and grounding
+    # 5. Generate content using Gemini 3.5 Flash
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            logger.info("Calling Gemini 3.5 Flash for RAG grounded generation...")
+            response = client.models.generate_content(
+                model="gemini-3.5-flash",
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.2 # Lower temperature for factual accuracy and grounding
+                )
             )
-        )
-        
-        answer = response.text.strip() if response.text else "Sorry, I could not generate an answer."
-        return answer, chunks
-        
-    except Exception as e:
-        logger.error(f"Failed to generate RAG response: {e}")
-        return f"An error occurred while answering your query: {e}", []
+            
+            answer = response.text.strip() if response.text else "Sorry, I could not generate an answer."
+            return answer, chunks
+            
+        except Exception as e:
+            if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
+                logger.warning(f"Transient Gemini API error in chatbot (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
+                time.sleep(2)
+                continue
+            logger.error(f"Failed to generate RAG response: {e}")
+            return f"An error occurred while answering your query: {e}", []

@@ -3,6 +3,7 @@ Gemini service layer for interacting with Google Gemini 2.5 Flash model.
 Provides methods for summary generation, resume vs JD analysis, and interview question generation.
 """
 import os
+import time
 import json
 import logging
 from dotenv import load_dotenv
@@ -56,17 +57,23 @@ def generate_resume_summary(resume_text: str) -> str:
     Generates a professional resume summary from the candidate's parsed text.
     """
     logger.info("Generating resume summary using Gemini API...")
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=[RESUME_SUMMARY_PROMPT, f"Candidate Resume Text:\n{resume_text}"]
-        )
-        if response.text:
-            return response.text.strip()
-        raise ValueError("Empty response returned from Gemini API.")
-    except Exception as e:
-        logger.error(f"Gemini resume summary generation failed: {e}")
-        return f"Failed to generate summary: {e}"
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.5-flash",
+                contents=[RESUME_SUMMARY_PROMPT, f"Candidate Resume Text:\n{resume_text}"]
+            )
+            if response.text:
+                return response.text.strip()
+            raise ValueError("Empty response returned from Gemini API.")
+        except Exception as e:
+            if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
+                logger.warning(f"Transient Gemini API error during summary (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
+                time.sleep(2)
+                continue
+            logger.error(f"Gemini resume summary generation failed: {e}")
+            return f"Failed to generate summary: {e}"
 
 def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
     """
@@ -77,27 +84,33 @@ def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
     """
     logger.info("Performing Resume vs JD analysis...")
     formatted_prompt = RESUME_VS_JD_PROMPT.replace("{resume_text}", resume_text).replace("{jd_text}", jd_text)
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=formatted_prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.5-flash",
+                contents=formatted_prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                )
             )
-        )
-        if response.text:
-            return clean_json_response(response.text)
-        raise ValueError("Empty response returned from Gemini API.")
-    except Exception as e:
-        logger.error(f"Resume vs JD comparison failed: {e}")
-        return {
-            "match_percentage": 0,
-            "hiring_recommendation": "Unsuitable",
-            "missing_skills": [],
-            "strengths": [],
-            "weaknesses": [f"Analysis failed: {e}"],
-            "match_explanation": f"Failed to execute match analysis: {e}"
-        }
+            if response.text:
+                return clean_json_response(response.text)
+            raise ValueError("Empty response returned from Gemini API.")
+        except Exception as e:
+            if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
+                logger.warning(f"Transient Gemini API error during analysis (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
+                time.sleep(2)
+                continue
+            logger.error(f"Resume vs JD comparison failed: {e}")
+            return {
+                "match_percentage": 0,
+                "hiring_recommendation": "Unsuitable",
+                "missing_skills": [],
+                "strengths": [],
+                "weaknesses": [f"Analysis failed: {e}"],
+                "match_explanation": f"Failed to execute match analysis: {e}"
+            }
 
 def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
     """
@@ -107,21 +120,27 @@ def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
     """
     logger.info("Generating custom interview questions...")
     formatted_prompt = INTERVIEW_QUESTIONS_PROMPT.replace("{resume_text}", resume_text).replace("{jd_text}", jd_text)
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.5-flash",
-            contents=formatted_prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.5-flash",
+                contents=formatted_prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                )
             )
-        )
-        if response.text:
-            return clean_json_response(response.text)
-        raise ValueError("Empty response returned from Gemini API.")
-    except Exception as e:
-        logger.error(f"Interview question generation failed: {e}")
-        return {
-            "technical": [],
-            "behavioral": [],
-            "hr": []
-        }
+            if response.text:
+                return clean_json_response(response.text)
+            raise ValueError("Empty response returned from Gemini API.")
+        except Exception as e:
+            if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
+                logger.warning(f"Transient Gemini API error during questions (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
+                time.sleep(2)
+                continue
+            logger.error(f"Interview question generation failed: {e}")
+            return {
+                "technical": [],
+                "behavioral": [],
+                "hr": []
+            }
