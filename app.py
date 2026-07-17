@@ -299,7 +299,7 @@ def main():
     
     # Header Area
     st.markdown('<div class="main-header">ResumeIQ AI</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">AI-Powered Candidate Screening & RAG Chatbot</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">AI-Powered Resume Screening & RAG Chatbot</div>', unsafe_allow_html=True)
     
     # Initialize session state variables
     if "processed" not in st.session_state:
