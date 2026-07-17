@@ -40,6 +40,12 @@ def inject_custom_styles():
                 font-family: 'Outfit', sans-serif;
             }
             
+            /* Background decoration */
+            .stApp {
+                background: radial-gradient(at 0% 0%, rgba(245, 243, 255, 0.5) 0, transparent 50%),
+                            radial-gradient(at 100% 100%, rgba(239, 246, 255, 0.5) 0, transparent 50%);
+            }
+            
             /* Gradient main headers */
             .main-header {
                 background: linear-gradient(135deg, #2E5BFF 0%, #8A2CFF 100%);
@@ -58,26 +64,27 @@ def inject_custom_styles():
                 margin-bottom: 2.5rem;
             }
             
-            /* Modern Card Container */
+            /* Modern Card Container with Glassmorphism */
             .premium-card {
-                background: rgba(255, 255, 255, 0.7);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                border-radius: 16px;
-                padding: 1.5rem;
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06);
+                background: rgba(255, 255, 255, 0.45);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.25);
+                border-radius: 20px;
+                padding: 1.8rem;
+                box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.04);
                 margin-bottom: 1.5rem;
             }
             
             /* Match Gauge Panel */
             .match-gauge-panel {
-                background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
-                border: 1px solid #E2E8F0;
-                border-radius: 16px;
+                background: rgba(255, 255, 255, 0.5);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px;
                 padding: 2rem;
                 text-align: center;
-                box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.02);
             }
             
             .match-score-text {
@@ -98,59 +105,78 @@ def inject_custom_styles():
             /* Custom Badges */
             .skill-badge {
                 display: inline-block;
-                background: linear-gradient(135deg, #E2EBFF 0%, #EFE5FF 100%);
-                color: #3842B0;
-                padding: 0.4rem 0.8rem;
-                border-radius: 12px;
+                background: linear-gradient(135deg, #F0F4FF 0%, #F5F0FF 100%);
+                color: #2E5BFF;
+                padding: 0.4rem 0.9rem;
+                border-radius: 14px;
                 font-size: 0.85rem;
-                font-weight: 500;
+                font-weight: 550;
                 margin: 0.25rem;
                 border: 1px solid #D2E0FF;
+                transition: all 0.25s ease;
+            }
+            .skill-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(46, 91, 255, 0.15);
+                border-color: #A3B8FF;
             }
             
             .soft-skill-badge {
                 display: inline-block;
                 background: linear-gradient(135deg, #E3FAF2 0%, #D1F2E5 100%);
                 color: #0F5132;
-                padding: 0.4rem 0.8rem;
-                border-radius: 12px;
+                padding: 0.4rem 0.9rem;
+                border-radius: 14px;
                 font-size: 0.85rem;
-                font-weight: 500;
+                font-weight: 550;
                 margin: 0.25rem;
                 border: 1px solid #C3E6CB;
+                transition: all 0.25s ease;
+            }
+            .soft-skill-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(15, 81, 50, 0.15);
+                border-color: #A3E2C9;
             }
             
             .missing-skill-badge {
                 display: inline-block;
                 background: linear-gradient(135deg, #FFF5F5 0%, #FFE3E3 100%);
                 color: #C53030;
-                padding: 0.4rem 0.8rem;
-                border-radius: 12px;
+                padding: 0.4rem 0.9rem;
+                border-radius: 14px;
                 font-size: 0.85rem;
-                font-weight: 500;
+                font-weight: 550;
                 margin: 0.25rem;
                 border: 1px solid #FEB2B2;
+                transition: all 0.25s ease;
+            }
+            .missing-skill-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(197, 48, 48, 0.15);
+                border-color: #FEB2B2;
             }
             
             .lang-badge {
                 display: inline-block;
                 background: linear-gradient(135deg, #FFF3CD 0%, #FFEBAA 100%);
                 color: #664D03;
-                padding: 0.4rem 0.8rem;
-                border-radius: 12px;
+                padding: 0.4rem 0.9rem;
+                border-radius: 14px;
                 font-size: 0.85rem;
-                font-weight: 500;
+                font-weight: 550;
                 margin: 0.25rem;
                 border: 1px solid #FFE082;
             }
             
             .recommendation-badge {
                 display: inline-block;
-                padding: 0.5rem 1rem;
+                padding: 0.5rem 1.2rem;
                 border-radius: 20px;
                 font-weight: 700;
-                font-size: 1rem;
-                margin-top: 0.5rem;
+                font-size: 0.95rem;
+                margin-top: 0.8rem;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             }
             
             .rec-strong {
@@ -173,51 +199,89 @@ def inject_custom_styles():
             
             /* Profile details */
             .profile-item {
-                font-size: 0.95rem;
-                margin-bottom: 0.6rem;
+                font-size: 0.98rem;
+                margin-bottom: 0.8rem;
                 color: #4A5568;
+                border-bottom: 1px solid rgba(0,0,0,0.03);
+                padding-bottom: 0.4rem;
             }
             
             .profile-item strong {
-                width: 100px;
+                width: 110px;
                 display: inline-block;
-                color: #2D3748;
+                color: #1E293B;
             }
             
             .section-card {
                 border-left: 4px solid #8A2CFF;
-                background-color: #F8F9FA;
-                padding: 1rem;
+                background-color: rgba(248, 250, 252, 0.6);
+                padding: 1.2rem;
                 margin-bottom: 1rem;
-                border-radius: 0 8px 8px 0;
+                border-radius: 0 12px 12px 0;
+                transition: all 0.25s ease;
+                border-right: 1px solid rgba(0,0,0,0.02);
+                border-top: 1px solid rgba(0,0,0,0.02);
+                border-bottom: 1px solid rgba(0,0,0,0.02);
+            }
+            .section-card:hover {
+                background-color: rgba(241, 245, 249, 0.9);
+                transform: translateX(4px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             }
             
             .section-title {
                 font-weight: 600;
-                font-size: 1.1rem;
-                color: #2D3748;
+                font-size: 1.15rem;
+                color: #1E293B;
             }
             
             .section-sub {
                 font-size: 0.95rem;
-                color: #718096;
-                margin-bottom: 0.4rem;
+                color: #64748B;
+                margin-bottom: 0.5rem;
             }
             
             .section-desc {
-                font-size: 0.9rem;
-                color: #4A5568;
+                font-size: 0.92rem;
+                color: #475569;
                 white-space: pre-line;
+                line-height: 1.6;
+            }
+            
+            /* Chat bubble styling */
+            .user-bubble {
+                background: linear-gradient(135deg, #2E5BFF 0%, #8A2CFF 100%);
+                color: white;
+                padding: 0.9rem 1.3rem;
+                border-radius: 18px 18px 0 18px;
+                max-width: 75%;
+                margin-left: auto;
+                box-shadow: 0 4px 12px rgba(46, 91, 255, 0.15);
+                line-height: 1.5;
+            }
+            
+            .assistant-bubble {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(226, 232, 240, 0.8);
+                color: #1E293B;
+                padding: 0.9rem 1.3rem;
+                border-radius: 18px 18px 18px 0;
+                max-width: 75%;
+                margin-right: auto;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+                line-height: 1.5;
             }
             
             /* Sources display */
             .citation-container {
                 font-size: 0.85rem;
-                background-color: #F8FAFC;
+                background-color: rgba(248, 250, 252, 0.8);
                 border: 1px solid #E2E8F0;
-                border-radius: 8px;
-                padding: 0.8rem;
-                margin-top: 0.5rem;
+                border-radius: 10px;
+                padding: 0.9rem;
+                margin-top: 0.6rem;
+                line-height: 1.5;
             }
         </style>
         """,
@@ -403,12 +467,12 @@ def main():
                     f"""
                     <div class="premium-card" style="height:100%;">
                         <h3 style="margin-top:0; color:#2E5BFF;">👤 Contact Information</h3>
-                        <div class="profile-item"><strong>Name:</strong> {parsed.get("name") or "Not Detected"}</div>
-                        <div class="profile-item"><strong>Email:</strong> {parsed.get("email") or "Not Detected"}</div>
-                        <div class="profile-item"><strong>Phone:</strong> {parsed.get("phone") or "Not Detected"}</div>
-                        <div class="profile-item"><strong>LinkedIn:</strong> {ln_link}</div>
-                        <div class="profile-item"><strong>GitHub:</strong> {gh_link}</div>
-                        <div class="profile-item"><strong>Portfolio:</strong> {pf_link}</div>
+                        <div class="profile-item">👤 &nbsp;<strong>Name:</strong> {parsed.get("name") or "Not Detected"}</div>
+                        <div class="profile-item">📧 &nbsp;<strong>Email:</strong> {parsed.get("email") or "Not Detected"}</div>
+                        <div class="profile-item">📞 &nbsp;<strong>Phone:</strong> {parsed.get("phone") or "Not Detected"}</div>
+                        <div class="profile-item">🔗 &nbsp;<strong>LinkedIn:</strong> {ln_link}</div>
+                        <div class="profile-item">🐙 &nbsp;<strong>GitHub:</strong> {gh_link}</div>
+                        <div class="profile-item">🌐 &nbsp;<strong>Portfolio:</strong> {pf_link}</div>
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -546,6 +610,14 @@ def main():
                 score = analysis.get("match_percentage", 0)
                 rec = analysis.get("hiring_recommendation", "Unsuitable")
                 
+                # Determine gauge color
+                if score >= 80:
+                    stroke_color = "#10B981" # Green
+                elif score >= 55:
+                    stroke_color = "#F59E0B" # Amber
+                else:
+                    stroke_color = "#EF4444" # Red
+                
                 if rec == "Strong Fit":
                     rec_html = '<span class="recommendation-badge rec-strong">Strong Fit</span>'
                 elif rec == "Moderate Fit":
@@ -556,8 +628,29 @@ def main():
                 st.markdown(
                     f"""
                     <div class="match-gauge-panel">
-                        <div class="match-score-text">{score}%</div>
-                        <div class="match-label">Match Percentage Score</div>
+                        <svg viewBox="0 0 36 36" class="circular-chart" style="width: 130px; height: 130px; margin: 0 auto; display: block;">
+                          <path class="circle-bg"
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="rgba(0,0,0,0.05)"
+                            stroke-width="2.8"
+                          />
+                          <path class="circle"
+                            stroke-dasharray="{score}, 100"
+                            d="M18 2.0845
+                              a 15.9155 15.9155 0 0 1 0 31.831
+                              a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="{stroke_color}"
+                            stroke-width="2.8"
+                            stroke-linecap="round"
+                            style="transition: stroke-dasharray 0.8s ease-in-out;"
+                          />
+                          <text x="18" y="20.8" class="percentage" font-family="'Outfit', sans-serif" font-weight="800" font-size="8" text-anchor="middle" fill="#1E293B">{score}%</text>
+                        </svg>
+                        <div class="match-label" style="margin-top:0.8rem; font-weight:600; color:#475569;">Match Score</div>
                         {rec_html}
                     </div>
                     """,
@@ -583,8 +676,8 @@ def main():
             with c_strengths:
                 strengths = analysis.get("strengths", [])
                 if strengths:
-                    strengths_html = "".join(f"<li>{s}</li>" for s in strengths)
-                    strengths_content = f"<ul style='color:#4A5568; line-height:1.6;'>{strengths_html}</ul>"
+                    strengths_html = "".join(f"<li style='list-style-type: none; margin-bottom: 0.6rem;'>✔️ &nbsp;{s}</li>" for s in strengths)
+                    strengths_content = f"<ul style='color:#4A5568; line-height:1.6; padding-left:0;'>{strengths_html}</ul>"
                 else:
                     strengths_content = "<p><em>No strengths parsed or matching.</em></p>"
                 st.markdown(
@@ -600,8 +693,8 @@ def main():
             with c_weaknesses:
                 weaknesses = analysis.get("weaknesses", [])
                 if weaknesses:
-                    weaknesses_html = "".join(f"<li>{w}</li>" for w in weaknesses)
-                    weaknesses_content = f"<ul style='color:#4A5568; line-height:1.6;'>{weaknesses_html}</ul>"
+                    weaknesses_html = "".join(f"<li style='list-style-type: none; margin-bottom: 0.6rem;'>❌ &nbsp;{w}</li>" for w in weaknesses)
+                    weaknesses_content = f"<ul style='color:#4A5568; line-height:1.6; padding-left:0;'>{weaknesses_html}</ul>"
                 else:
                     weaknesses_content = "<p><em>No notable gaps found.</em></p>"
                 st.markdown(
@@ -684,17 +777,43 @@ def main():
             
             # Render chat messages
             for message in st.session_state.chat_history:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+                if message["role"] == "user":
+                    st.markdown(
+                        f"""
+                        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                            <div class="user-bubble">
+                                {message["content"]}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(
+                        f"""
+                        <div style="display: flex; justify-content: flex-start; margin-bottom: 1rem;">
+                            <div class="assistant-bubble">
+                                {message["content"]}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
                     
-                    # If this message was generated by assistant, we display the sources if present
-                    if message["role"] == "assistant" and "sources" in message and message["sources"]:
+                    # Display sources if present
+                    if "sources" in message and message["sources"]:
                         with st.expander("🔍 Grounding Sources (Document Chunks)"):
                             for i, src in enumerate(message["sources"]):
                                 src_lbl = "Resume" if src["source"] == "resume" else "Job Description"
-                                st.markdown(f"**Source {i+1} ({src_lbl} - Chunk #{src.get('index', 0)}):**")
-                                st.markdown(f"*{src['text']}*")
-                                st.markdown("---")
+                                st.markdown(
+                                    f"""
+                                    <div class="citation-container">
+                                        <strong>Source {i+1} ({src_lbl} - Segment #{src.get('index', 0)}):</strong><br/>
+                                        <span style="color:#475569; font-style:italic;">"{src['text']}"</span>
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
             
             # Input query
             query = st.chat_input("Ask a question about the candidate or job alignment...")
@@ -703,23 +822,45 @@ def main():
                 # Add user query to chat history
                 st.session_state.chat_history.append({"role": "user", "content": query})
                 
-                # Render query
-                with st.chat_message("user"):
-                    st.markdown(query)
-                    
+                # Render query immediately
+                st.markdown(
+                    f"""
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                        <div class="user-bubble">
+                            {query}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+                
                 # RAG response execution
-                with st.chat_message("assistant"):
-                    with st.spinner("Retrieving relevant documents and answering..."):
-                        answer, sources = generate_rag_response(query, st.session_state.chat_history[:-1])
-                        st.markdown(answer)
-                        
-                        if sources:
-                            with st.expander("🔍 Grounding Sources (Document Chunks)"):
-                                for i, src in enumerate(sources):
-                                    src_lbl = "Resume" if src["source"] == "resume" else "Job Description"
-                                    st.markdown(f"**Source {i+1} ({src_lbl} - Chunk #{src.get('index', 0)}):**")
-                                    st.markdown(f"*{src['text']}*")
-                                    st.markdown("---")
+                with st.spinner("Retrieving relevant documents and answering..."):
+                    answer, sources = generate_rag_response(query, st.session_state.chat_history[:-1])
+                    st.markdown(
+                        f"""
+                        <div style="display: flex; justify-content: flex-start; margin-bottom: 1rem;">
+                            <div class="assistant-bubble">
+                                {answer}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+                    
+                    if sources:
+                        with st.expander("🔍 Grounding Sources (Document Chunks)"):
+                            for i, src in enumerate(sources):
+                                src_lbl = "Resume" if src["source"] == "resume" else "Job Description"
+                                st.markdown(
+                                    f"""
+                                    <div class="citation-container">
+                                        <strong>Source {i+1} ({src_lbl} - Segment #{src.get('index', 0)}):</strong><br/>
+                                        <span style="color:#475569; font-style:italic;">"{src['text']}"</span>
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
                                     
                 # Add assistant reply to chat history
                 st.session_state.chat_history.append({
