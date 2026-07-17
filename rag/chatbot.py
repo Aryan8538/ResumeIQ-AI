@@ -81,7 +81,7 @@ def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[
     contents.append(f"Recruiter's Current Question: {query}")
     
     # 5. Generate content using Gemini 2.0 Flash
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             logger.info("Calling Gemini 2.0 Flash for RAG grounded generation...")
@@ -99,8 +99,9 @@ def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[
             
         except Exception as e:
             if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
-                logger.warning(f"Transient Gemini API error in chatbot (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
-                time.sleep(2)
+                sleep_time = (attempt + 1) * 4
+                logger.warning(f"Transient Gemini API error in chatbot (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                time.sleep(sleep_time)
                 continue
             logger.error(f"Failed to generate RAG response: {e}")
             return f"An error occurred while answering your query: {e}", []

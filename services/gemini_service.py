@@ -57,7 +57,7 @@ def generate_resume_summary(resume_text: str) -> str:
     Generates a professional resume summary from the candidate's parsed text.
     """
     logger.info("Generating resume summary using Gemini API...")
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
@@ -69,8 +69,9 @@ def generate_resume_summary(resume_text: str) -> str:
             raise ValueError("Empty response returned from Gemini API.")
         except Exception as e:
             if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
-                logger.warning(f"Transient Gemini API error during summary (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
-                time.sleep(2)
+                sleep_time = (attempt + 1) * 4
+                logger.warning(f"Transient Gemini API error during summary (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                time.sleep(sleep_time)
                 continue
             logger.error(f"Gemini resume summary generation failed: {e}")
             return f"Failed to generate summary: {e}"
@@ -84,7 +85,7 @@ def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
     """
     logger.info("Performing Resume vs JD analysis...")
     formatted_prompt = RESUME_VS_JD_PROMPT.replace("{resume_text}", resume_text).replace("{jd_text}", jd_text)
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
@@ -99,8 +100,9 @@ def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
             raise ValueError("Empty response returned from Gemini API.")
         except Exception as e:
             if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
-                logger.warning(f"Transient Gemini API error during analysis (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
-                time.sleep(2)
+                sleep_time = (attempt + 1) * 4
+                logger.warning(f"Transient Gemini API error during analysis (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                time.sleep(sleep_time)
                 continue
             logger.error(f"Resume vs JD comparison failed: {e}")
             return {
@@ -120,7 +122,7 @@ def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
     """
     logger.info("Generating custom interview questions...")
     formatted_prompt = INTERVIEW_QUESTIONS_PROMPT.replace("{resume_text}", resume_text).replace("{jd_text}", jd_text)
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
@@ -135,8 +137,9 @@ def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
             raise ValueError("Empty response returned from Gemini API.")
         except Exception as e:
             if ("503" in str(e) or "429" in str(e)) and attempt < max_retries - 1:
-                logger.warning(f"Transient Gemini API error during questions (attempt {attempt+1}/{max_retries}): {e}. Retrying in 2 seconds...")
-                time.sleep(2)
+                sleep_time = (attempt + 1) * 4
+                logger.warning(f"Transient Gemini API error during questions (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                time.sleep(sleep_time)
                 continue
             logger.error(f"Interview question generation failed: {e}")
             return {
