@@ -130,3 +130,6 @@ exports/*
 !exports/.gitkeep
 reports/*
 !reports/.gitkeep
+
+# Vector Database
+chroma_db/
