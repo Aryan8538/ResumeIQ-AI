@@ -420,7 +420,7 @@ def main():
                                 
         st.markdown("---")
         st.markdown("**Version**: ResumeIQ AI")
-        st.markdown("**Model**: Gemini 2.5 Flash")
+        st.markdown("**Model**: Gemini 2.0 Flash")
 
     # Main dashboard view
     if not st.session_state.processed:

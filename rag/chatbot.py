@@ -80,13 +80,13 @@ def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[
         contents.append(f"Recent Conversation History:\n{history_str}")
     contents.append(f"Recruiter's Current Question: {query}")
     
-    # 5. Generate content using Gemini 2.5 Flash
+    # 5. Generate content using Gemini 2.0 Flash
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            logger.info("Calling Gemini 2.5 Flash for RAG grounded generation...")
+            logger.info("Calling Gemini 2.0 Flash for RAG grounded generation...")
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.0-flash",
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=system_instruction,

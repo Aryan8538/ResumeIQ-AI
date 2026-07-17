@@ -7,7 +7,7 @@ ResumeIQ AI is an enterprise-grade, AI-powered resume screening assistant. It en
 ## ✨ Features
 
 - **Multi-Format Parsing**: Extracts text from PDF and DOCX resumes using a robust offline pipeline.
-- **AI Summary**: Generates a professional candidate executive summary using `gemini-2.5-flash`.
+- **AI Summary**: Generates a professional candidate executive summary using `gemini-2.0-flash`.
 - **Match Analysis**: Computes a matching percentage, extracts core candidate strengths, analyzes weaknesses, and flags missing skill gaps.
 - **Interview Question Generator**: Generates customized Technical, Behavioral (STAR format), and HR interview questions along with ideal response guides.
 - **RAG-Powered Chatbot**: Interactive recruiter chatbot grounded in candidate materials with grounding citations (displays matching document segments).
@@ -17,7 +17,7 @@ ResumeIQ AI is an enterprise-grade, AI-powered resume screening assistant. It en
 ## 🛠️ Technology Stack
 
 - **Frontend Dashboard**: Streamlit (Premium layout, custom badges, metric visualizers)
-- **Generative AI Core**: Google Gemini 2.5 Flash (`gemini-2.5-flash`)
+- **Generative AI Core**: Google Gemini 2.0 Flash (`gemini-2.0-flash`)
 - **Semantic Vector Embeddings**: Gemini Embeddings (`gemini-embedding-2`)
 - **Vector Database**: ChromaDB (Local persistent instance)
 - **Offline Parsing**: PyMuPDF, pdfplumber, python-docx, and spaCy NER (`en_core_web_sm`)

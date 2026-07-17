@@ -61,7 +61,7 @@ def generate_resume_summary(resume_text: str) -> str:
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.0-flash",
                 contents=[RESUME_SUMMARY_PROMPT, f"Candidate Resume Text:\n{resume_text}"]
             )
             if response.text:
@@ -88,7 +88,7 @@ def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.0-flash",
                 contents=formatted_prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -124,7 +124,7 @@ def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
     for attempt in range(max_retries):
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.0-flash",
                 contents=formatted_prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
