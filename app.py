@@ -234,7 +234,7 @@ def main():
     inject_custom_styles()
     
     # Header Area
-    st.markdown('<div class="main-header">ResumeIQ AI 2.0</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">ResumeIQ AI</div>', unsafe_allow_html=True)
     st.markdown('<div class="subtitle">AI-Powered Candidate Screening & RAG Chatbot</div>', unsafe_allow_html=True)
     
     # Initialize session state variables
@@ -351,7 +351,7 @@ def main():
                                 logger.warning(f"Could not remove temp file {path}: {cleanup_err}")
                                 
         st.markdown("---")
-        st.markdown("**Version**: ResumeIQ AI 2.0")
+        st.markdown("**Version**: ResumeIQ AI")
         st.markdown("**Model**: Gemini 3.5 Flash")
 
     # Main dashboard view
@@ -360,7 +360,7 @@ def main():
         st.markdown(
             """
             <div class="premium-card">
-                <h3 style="color:#2E5BFF; margin-top:0;">👋 Welcome to ResumeIQ AI 2.0</h3>
+                <h3 style="color:#2E5BFF; margin-top:0;">👋 Welcome to ResumeIQ AI</h3>
                 <p>An enterprise-grade recruiter screening assistant powered by <strong>Generative AI</strong> and <strong>Retrieval-Augmented Generation (RAG)</strong>.</p>
                 <p>Upload a Candidate Resume and a Job Description in the sidebar to:</p>
                 <ul>
