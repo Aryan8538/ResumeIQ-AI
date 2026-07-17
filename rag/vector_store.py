@@ -1,5 +1,5 @@
 """
-Vector Database interaction layer for ResumeIQ-AI.
+Vector Database interaction layer for ResumeIQ AI.
 Wraps ChromaDB PersistentClient to save and load document chunks with explicit embeddings.
 """
 import os

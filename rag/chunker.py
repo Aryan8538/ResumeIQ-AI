@@ -1,5 +1,5 @@
 """
-Document chunking utility for ResumeIQ-AI RAG pipeline.
+Document chunking utility for ResumeIQ AI RAG pipeline.
 Splits text into smaller, overlapping chunks suitable for semantic search embeddings.
 """
 

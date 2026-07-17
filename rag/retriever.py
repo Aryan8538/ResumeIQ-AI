@@ -1,5 +1,5 @@
 """
-Retriever service for ResumeIQ-AI.
+Retriever service for ResumeIQ AI.
 Generates a query embedding and queries ChromaDB to find the most relevant document chunks.
 """
 import logging

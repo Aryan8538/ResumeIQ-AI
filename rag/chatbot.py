@@ -1,5 +1,5 @@
 """
-Chatbot service coordinating RAG (Retrieval-Augmented Generation) pipeline for ResumeIQ-AI.
+Chatbot service coordinating RAG (Retrieval-Augmented Generation) pipeline for ResumeIQ AI.
 Retrieves context, formats conversational history, and calls Gemini with strict grounding guidelines.
 """
 import os

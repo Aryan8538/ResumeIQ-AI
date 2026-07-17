@@ -1,6 +1,6 @@
-# ResumeIQ-AI 2.0
+# ResumeIQ AI 2.0
 
-ResumeIQ-AI 2.0 is an enterprise-grade, AI-powered resume screening assistant. It enables recruiters to parse resumes, analyze candidates against job descriptions (JDs), identify skill gaps, generate customized interview questions, and converse with a chatbot grounded directly in the candidate's uploaded files using **Retrieval-Augmented Generation (RAG)**.
+ResumeIQ AI 2.0 is an enterprise-grade, AI-powered resume screening assistant. It enables recruiters to parse resumes, analyze candidates against job descriptions (JDs), identify skill gaps, generate customized interview questions, and converse with a chatbot grounded directly in the candidate's uploaded files using **Retrieval-Augmented Generation (RAG)**.
 
 ---
 

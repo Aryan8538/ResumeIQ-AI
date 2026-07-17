@@ -1,5 +1,5 @@
 def main():
-    print("Hello from resumeiq-ai!")
+    print("Hello from ResumeIQ AI!")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 """
-Embeddings generator service for ResumeIQ-AI.
+Embeddings generator service for ResumeIQ AI.
 Communicates with Gemini Embeddings API (gemini-embedding-2) to vectorize document chunks.
 """
 import os

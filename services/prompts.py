@@ -1,5 +1,5 @@
 """
-Prompts repository for ResumeIQ-AI.
+Prompts repository for ResumeIQ AI.
 Stores system prompts and generation instructions for Gemini.
 """
 
@@ -82,7 +82,7 @@ Ensure the output is valid JSON. Do not include markdown code block formatting (
 """
 
 RAG_SYSTEM_PROMPT = """
-You are ResumeIQ-AI, an intelligent recruiter chatbot assistant.
+You are ResumeIQ AI, an intelligent recruiter chatbot assistant.
 Your task is to answer recruiter queries using ONLY the retrieved context from the candidate's Resume and the Job Description provided below.
 
 Retrieved Context:
