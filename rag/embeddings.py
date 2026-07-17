@@ -44,16 +44,21 @@ def get_embeddings(texts: list[str]) -> list[list[float]]:
         
     client = _get_client()
     try:
-        logger.info(f"Requesting embeddings for {len(texts)} chunks from gemini-embedding-2...")
+        logger.info(f"Requesting embeddings for {len(texts)} chunks from gemini-embedding-2 in a batch call...")
+        from google.genai import types
+        contents = [types.Content(parts=[types.Part.from_text(text=t)]) for t in texts]
+        response = client.models.embed_content(
+            model="gemini-embedding-2",
+            contents=contents,
+        )
+        if not response.embeddings:
+            raise ValueError("No embeddings returned by Gemini Embeddings API.")
+            
         embeddings = []
-        for text in texts:
-            response = client.models.embed_content(
-                model="gemini-embedding-2",
-                contents=text,
-            )
-            if not response.embeddings or not response.embeddings[0].values:
-                raise ValueError("No embeddings returned by Gemini Embeddings API for a text chunk.")
-            embeddings.append(response.embeddings[0].values)
+        for i, emb in enumerate(response.embeddings):
+            if not emb.values:
+                raise ValueError(f"Empty embedding values returned for chunk index {i}.")
+            embeddings.append(emb.values)
         return embeddings
         
     except Exception as e:

@@ -6,6 +6,7 @@ the RAG recruiter chatbot grounded in candidate materials.
 import os
 import sys
 import logging
+import concurrent.futures
 import streamlit as st
 
 # Ensure workspace root is in path
@@ -375,16 +376,19 @@ def main():
                         st.session_state.parsed_data = parsed_profile
                         
                     with st.spinner("Calling Gemini 3.5 Flash for analysis..."):
-                        # AI summary
-                        summary = generate_resume_summary(resume_text)
+                        with concurrent.futures.ThreadPoolExecutor() as executor:
+                            # Submit Gemini API calls concurrently
+                            future_summary = executor.submit(generate_resume_summary, resume_text)
+                            future_analysis = executor.submit(analyze_resume_vs_jd, resume_text, jd_text)
+                            future_questions = executor.submit(generate_interview_questions, resume_text, jd_text)
+                            
+                            # Gather results
+                            summary = future_summary.result()
+                            analysis = future_analysis.result()
+                            questions = future_questions.result()
+                            
                         st.session_state.ai_summary = summary
-                        
-                        # Compare JD and Resume
-                        analysis = analyze_resume_vs_jd(resume_text, jd_text)
                         st.session_state.analysis = analysis
-                        
-                        # Generate Interview Questions
-                        questions = generate_interview_questions(resume_text, jd_text)
                         st.session_state.questions = questions
                         
                     with st.spinner("Creating text vector embeddings & building RAG database..."):
