@@ -391,12 +391,6 @@ def main():
             c_info, c_sum = st.columns([2, 3])
             
             with c_info:
-                st.markdown('<div class="premium-card" style="height:100%;">', unsafe_allow_html=True)
-                st.subheader("👤 Contact Information")
-                st.markdown(f'<div class="profile-item"><strong>Name:</strong> {parsed.get("name") or "Not Detected"}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="profile-item"><strong>Email:</strong> {parsed.get("email") or "Not Detected"}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="profile-item"><strong>Phone:</strong> {parsed.get("phone") or "Not Detected"}</div>', unsafe_allow_html=True)
-                
                 # Links
                 ln = parsed.get("linkedin")
                 gh = parsed.get("github")
@@ -405,42 +399,68 @@ def main():
                 gh_link = f'<a href="{gh}" target="_blank">View Profile</a>' if gh else "Not Provided"
                 pf_link = f'<a href="{pf}" target="_blank">View Portfolio</a>' if pf else "Not Provided"
                 
-                st.markdown(f'<div class="profile-item"><strong>LinkedIn:</strong> {ln_link}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="profile-item"><strong>GitHub:</strong> {gh_link}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="profile-item"><strong>Portfolio:</strong> {pf_link}</div>', unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="height:100%;">
+                        <h3 style="margin-top:0; color:#2E5BFF;">👤 Contact Information</h3>
+                        <div class="profile-item"><strong>Name:</strong> {parsed.get("name") or "Not Detected"}</div>
+                        <div class="profile-item"><strong>Email:</strong> {parsed.get("email") or "Not Detected"}</div>
+                        <div class="profile-item"><strong>Phone:</strong> {parsed.get("phone") or "Not Detected"}</div>
+                        <div class="profile-item"><strong>LinkedIn:</strong> {ln_link}</div>
+                        <div class="profile-item"><strong>GitHub:</strong> {gh_link}</div>
+                        <div class="profile-item"><strong>Portfolio:</strong> {pf_link}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             with c_sum:
-                st.markdown('<div class="premium-card" style="height:100%;">', unsafe_allow_html=True)
-                st.subheader("📝 Professional Summary (Gemini Generated)")
-                st.write(st.session_state.ai_summary)
-                st.markdown('</div>', unsafe_allow_html=True)
+                summary_text = st.session_state.ai_summary or "No summary available."
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="height:100%;">
+                        <h3 style="margin-top:0; color:#2E5BFF;">📝 Professional Summary</h3>
+                        <p style="white-space: pre-line; line-height: 1.6; color: #4A5568;">{summary_text}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             # Skills row
             st.markdown("### ⚙️ Skills & Competencies")
             c_ts, c_ss = st.columns(2)
             
             with c_ts:
-                st.markdown('<div class="premium-card" style="min-height:160px;">', unsafe_allow_html=True)
-                st.markdown("#### Technical Skills")
                 tech_skills = parsed.get("skills", [])
                 if tech_skills:
                     badges = "".join(f'<span class="skill-badge">{s}</span>' for s in tech_skills)
-                    st.markdown(badges, unsafe_allow_html=True)
                 else:
-                    st.info("No technical skills detected by parser database.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                    badges = "<p><em>No technical skills detected by parser database.</em></p>"
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="min-height:160px;">
+                        <h4 style="margin-top:0; color:#2E5BFF; margin-bottom:1rem;">Technical Skills</h4>
+                        {badges}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             with c_ss:
-                st.markdown('<div class="premium-card" style="min-height:160px;">', unsafe_allow_html=True)
-                st.markdown("#### Soft Skills")
                 soft_skills = parsed.get("soft_skills", [])
                 if soft_skills:
                     badges = "".join(f'<span class="soft-skill-badge">{s}</span>' for s in soft_skills)
-                    st.markdown(badges, unsafe_allow_html=True)
                 else:
-                    st.info("No soft skills parsed.")
-                st.markdown('</div>', unsafe_allow_html=True)
+                    badges = "<p><em>No soft skills parsed.</em></p>"
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="min-height:160px;">
+                        <h4 style="margin-top:0; color:#0F5132; margin-bottom:1rem;">Soft Skills</h4>
+                        {badges}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             # Work experience details
             with st.expander("💼 Professional Experience", expanded=True):
@@ -523,64 +543,95 @@ def main():
             c_score, c_rec = st.columns([1, 2])
             
             with c_score:
-                st.markdown('<div class="match-gauge-panel">', unsafe_allow_html=True)
                 score = analysis.get("match_percentage", 0)
-                st.markdown(f'<div class="match-score-text">{score}%</div>', unsafe_allow_html=True)
-                st.markdown('<div class="match-label">Match Percentage Score</div>', unsafe_allow_html=True)
-                
-                # Recommendation Badge Styling
                 rec = analysis.get("hiring_recommendation", "Unsuitable")
+                
                 if rec == "Strong Fit":
-                    st.markdown('<span class="recommendation-badge rec-strong">Strong Fit</span>', unsafe_allow_html=True)
+                    rec_html = '<span class="recommendation-badge rec-strong">Strong Fit</span>'
                 elif rec == "Moderate Fit":
-                    st.markdown('<span class="recommendation-badge rec-moderate">Moderate Fit</span>', unsafe_allow_html=True)
+                    rec_html = '<span class="recommendation-badge rec-moderate">Moderate Fit</span>'
                 else:
-                    st.markdown('<span class="recommendation-badge rec-unsuitable">Unsuitable</span>', unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+                    rec_html = '<span class="recommendation-badge rec-unsuitable">Unsuitable</span>'
+                    
+                st.markdown(
+                    f"""
+                    <div class="match-gauge-panel">
+                        <div class="match-score-text">{score}%</div>
+                        <div class="match-label">Match Percentage Score</div>
+                        {rec_html}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             with c_rec:
-                st.markdown('<div class="premium-card" style="height:100%;">', unsafe_allow_html=True)
-                st.subheader("💡 Match Explanation")
-                st.write(analysis.get("match_explanation", "No explanation available."))
-                st.markdown('</div>', unsafe_allow_html=True)
+                explanation = analysis.get("match_explanation", "No explanation available.")
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="height:100%;">
+                        <h3 style="margin-top:0; color:#2E5BFF;">💡 Match Explanation</h3>
+                        <p style="line-height:1.6; color: #4A5568;">{explanation}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             st.markdown("---")
             
             # Gaps analysis
             c_strengths, c_weaknesses = st.columns(2)
             with c_strengths:
-                st.markdown('<div class="premium-card" style="min-height:220px;">', unsafe_allow_html=True)
-                st.subheader("✅ Candidate Strengths")
                 strengths = analysis.get("strengths", [])
                 if strengths:
-                    for s in strengths:
-                        st.write(f"- {s}")
+                    strengths_html = "".join(f"<li>{s}</li>" for s in strengths)
+                    strengths_content = f"<ul style='color:#4A5568; line-height:1.6;'>{strengths_html}</ul>"
                 else:
-                    st.write("*No strengths parsed or matching.*")
-                st.markdown('</div>', unsafe_allow_html=True)
+                    strengths_content = "<p><em>No strengths parsed or matching.</em></p>"
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="min-height:220px;">
+                        <h3 style="margin-top:0; color:#2E5BFF;">✅ Candidate Strengths</h3>
+                        {strengths_content}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             with c_weaknesses:
-                st.markdown('<div class="premium-card" style="min-height:220px;">', unsafe_allow_html=True)
-                st.subheader("❌ Candidate Weaknesses / Gaps")
                 weaknesses = analysis.get("weaknesses", [])
                 if weaknesses:
-                    for w in weaknesses:
-                        st.write(f"- {w}")
+                    weaknesses_html = "".join(f"<li>{w}</li>" for w in weaknesses)
+                    weaknesses_content = f"<ul style='color:#4A5568; line-height:1.6;'>{weaknesses_html}</ul>"
                 else:
-                    st.write("*No notable gaps found.*")
-                st.markdown('</div>', unsafe_allow_html=True)
+                    weaknesses_content = "<p><em>No notable gaps found.</em></p>"
+                st.markdown(
+                    f"""
+                    <div class="premium-card" style="min-height:220px;">
+                        <h3 style="margin-top:0; color:#C53030;">❌ Candidate Weaknesses / Gaps</h3>
+                        {weaknesses_content}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
                 
             # Missing Skills Row
-            st.markdown('<div class="premium-card">', unsafe_allow_html=True)
-            st.subheader("⚠️ Missing Skills Detection")
-            st.write("Skills found in the Job Description that were not explicitly detected in the candidate's resume:")
             missing = analysis.get("missing_skills", [])
             if missing:
                 badges = "".join(f'<span class="missing-skill-badge">{s}</span>' for s in missing)
-                st.markdown(badges, unsafe_allow_html=True)
+                missing_content = badges
             else:
-                st.success("No missing skills! The candidate matches the requested skillset catalog.")
-            st.markdown('</div>', unsafe_allow_html=True)
+                missing_content = '<div style="background-color: #DEF7EC; color: #03543F; padding: 1rem; border-radius: 8px; border: 1px solid #84E1BC; font-weight: 500;">No missing skills! The candidate matches the requested skillset catalog.</div>'
+                
+            st.markdown(
+                f"""
+                <div class="premium-card">
+                    <h3 style="margin-top:0; color:#2E5BFF;">⚠️ Missing Skills Detection</h3>
+                    <p style="color:#4A5568; margin-bottom: 1rem;">Skills found in the Job Description that were not explicitly detected in the candidate's resume:</p>
+                    {missing_content}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             
             st.markdown("---")
             
