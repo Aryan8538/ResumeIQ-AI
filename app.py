@@ -375,7 +375,7 @@ def main():
                         parsed_profile = extract_resume_info(resume_text)
                         st.session_state.parsed_data = parsed_profile
                         
-                    with st.spinner("Calling Gemini 3.5 Flash for analysis..."):
+                    with st.spinner("Calling Gemini 2.0 Flash for analysis..."):
                         with concurrent.futures.ThreadPoolExecutor() as executor:
                             # Submit Gemini API calls concurrently
                             future_summary = executor.submit(generate_resume_summary, resume_text)
