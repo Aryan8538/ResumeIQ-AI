@@ -1,11 +1,13 @@
 """
-Chatbot Grounding Service for ResumeIQ AI.
-Uses an OpenAI-compatible Groq client to query Llama 3.3 70B with RAG context chunks.
+Chatbot Grounding Service with dual-engine fallback (Groq Llama 3.3 / Gemini 2.0 Flash).
+Uses retrieve_relevant_chunks from vector store to answer context-grounded queries.
 """
 import os
 import time
 import logging
 from openai import OpenAI
+from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 from rag.retriever import retrieve_relevant_chunks
 
@@ -14,30 +16,35 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Initialize Groq Client
+# Initialize active client
 def _get_client():
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        logger.error("GROQ_API_KEY environment variable is not defined.")
-        raise ValueError("GROQ_API_KEY environment variable is missing. Set it in the .env file.")
-    return OpenAI(
-        base_url="https://api.groq.com/openai/v1",
-        api_key=api_key
-    )
+    groq_key = os.environ.get("GROQ_API_KEY")
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    
+    if groq_key:
+        return OpenAI(
+            base_url="https://api.groq.com/openai/v1",
+            api_key=groq_key
+        ), True
+    elif gemini_key:
+        return genai.Client(api_key=gemini_key), False
+    else:
+        logger.error("Neither GROQ_API_KEY nor GEMINI_API_KEY is configured.")
+        raise ValueError("Missing API credentials. Set GROQ_API_KEY or GEMINI_API_KEY.")
 
 def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[str, list[dict]]:
     """
-    Executes the RAG lifecycle:
-    1. Retrieves relevant document chunks.
-    2. Constructs a context-grounded system instruction.
-    3. Builds message payload incorporating recent chat history.
-    4. Calls Groq and returns the generated response and source citations.
+    Executes the RAG chatbot lifecycle with dual-engine fallback.
     """
     if not query or not query.strip():
         return "Please ask a question.", []
         
-    client = _get_client()
-    
+    try:
+        client, is_groq = _get_client()
+    except Exception as credential_err:
+        logger.error(f"Failed to initialize chatbot client: {credential_err}")
+        return f"Authentication error: {credential_err}", []
+        
     # 1. Retrieve most relevant context chunks (up to 5)
     try:
         logger.info(f"Retrieving candidate chunks for chatbot query: '{query}'")
@@ -67,34 +74,52 @@ def generate_rag_response(query: str, chat_history: list[dict] = None) -> tuple[
         "3. Keep your answers concise, professional, and directly relevant to the recruiter's inquiry."
     )
     
-    # 4. Compile messages payload with history
-    messages = [{"role": "system", "content": system_instruction}]
-    
-    if chat_history:
-        # Keep only the last 6 messages to preserve token window context
-        for msg in chat_history[-6:]:
-            messages.append({"role": msg["role"], "content": msg["content"]})
-            
-    messages.append({"role": "user", "content": query})
-    
-    # 5. Generate content using Groq
+    # 4. Generate response based on client engine
     max_retries = 5
     for attempt in range(max_retries):
         try:
-            logger.info("Calling Llama 3.3 (Groq) for RAG grounded generation...")
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=messages,
-                temperature=0.2 # Lower temperature for factual accuracy and grounding
-            )
-            
-            answer = response.choices[0].message.content.strip() if response.choices[0].message.content else "Sorry, I could not generate an answer."
+            if is_groq:
+                # Compile messages list for OpenAI-compatible client
+                messages = [{"role": "system", "content": system_instruction}]
+                if chat_history:
+                    for msg in chat_history[-6:]:
+                        messages.append({"role": msg["role"], "content": msg["content"]})
+                messages.append({"role": "user", "content": query})
+                
+                logger.info("Calling Llama 3.3 (Groq) for RAG grounded generation...")
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=messages,
+                    temperature=0.2
+                )
+                answer = response.choices[0].message.content.strip() if response.choices[0].message.content else "Sorry, I could not generate an answer."
+            else:
+                # Compile string contents list for Gemini client
+                contents = []
+                contents.append(f"Grounded Candidate Context:\n{context_text}")
+                if chat_history:
+                    for msg in chat_history[-6:]:
+                        role_label = "Recruiter" if msg["role"] == "user" else "Assistant"
+                        contents.append(f"{role_label}: {msg['content']}")
+                contents.append(f"Recruiter's Current Question: {query}")
+                
+                logger.info("Calling Gemini 2.0 Flash for RAG grounded generation...")
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=contents,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_instruction,
+                        temperature=0.2
+                    )
+                )
+                answer = response.text.strip() if response.text else "Sorry, I could not generate an answer."
+                
             return answer, chunks
             
         except Exception as e:
             if ("503" in str(e) or "429" in str(e) or "rate_limit" in str(e).lower()) and attempt < max_retries - 1:
                 sleep_time = (attempt + 1) * 4
-                logger.warning(f"Transient Groq API error in chatbot (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                logger.warning(f"Transient LLM API error in chatbot (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
                 time.sleep(sleep_time)
                 continue
             logger.error(f"Failed to generate RAG response: {e}")

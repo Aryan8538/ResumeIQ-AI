@@ -1,5 +1,5 @@
 """
-Groq service layer for interacting with Llama 3.3 70B model.
+Service layer with dual-engine fallback (Groq Llama 3.3 / Gemini 2.0 Flash).
 Provides methods for summary generation, resume vs JD analysis, and interview question generation.
 """
 import os
@@ -8,6 +8,8 @@ import json
 import logging
 from dotenv import load_dotenv
 from openai import OpenAI
+from google import genai
+from google.genai import types
 from services.prompts import (
     RESUME_SUMMARY_PROMPT,
     RESUME_VS_JD_PROMPT,
@@ -19,21 +21,31 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# Fetch API Key
-api_key = os.environ.get("GROQ_API_KEY")
-if not api_key:
-    logger.error("GROQ_API_KEY environment variable is not set.")
-    raise ValueError("GROQ_API_KEY environment variable is not set. Please add it to your .env file.")
+# Fetch API Keys
+groq_key = os.environ.get("GROQ_API_KEY")
+gemini_key = os.environ.get("GEMINI_API_KEY")
 
-# Initialize OpenAI-compatible Groq Client
+use_groq = True
+if not groq_key:
+    if gemini_key:
+        logger.warning("GROQ_API_KEY not configured. Falling back to Gemini Client.")
+        use_groq = False
+    else:
+        logger.error("Neither GROQ_API_KEY nor GEMINI_API_KEY is set.")
+        raise ValueError("Missing API credentials. Set GROQ_API_KEY or GEMINI_API_KEY.")
+
+# Initialize the active client
 try:
-    client = OpenAI(
-        base_url="https://api.groq.com/openai/v1",
-        api_key=api_key
-    )
+    if use_groq:
+        client = OpenAI(
+            base_url="https://api.groq.com/openai/v1",
+            api_key=groq_key
+        )
+    else:
+        client = genai.Client(api_key=gemini_key)
 except Exception as e:
-    logger.error(f"Failed to initialize Groq Client: {e}")
-    raise RuntimeError(f"Failed to initialize Groq Client: {e}") from e
+    logger.error(f"Failed to initialize LLM client: {e}")
+    raise RuntimeError(f"Client initialization failure: {e}") from e
 
 def clean_json_response(response_text: str) -> dict:
     """
@@ -58,28 +70,36 @@ def generate_resume_summary(resume_text: str) -> str:
     """
     Generates a professional resume summary from the candidate's parsed text.
     """
-    logger.info("Generating resume summary using Groq API...")
+    logger.info("Generating resume summary...")
     max_retries = 5
     for attempt in range(max_retries):
         try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": RESUME_SUMMARY_PROMPT},
-                    {"role": "user", "content": f"Candidate Resume Text:\n{resume_text}"}
-                ]
-            )
-            content = response.choices[0].message.content
-            if content:
-                return content.strip()
-            raise ValueError("Empty response returned from Groq API.")
+            if use_groq:
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "system", "content": RESUME_SUMMARY_PROMPT},
+                        {"role": "user", "content": f"Candidate Resume Text:\n{resume_text}"}
+                    ]
+                )
+                content = response.choices[0].message.content
+                if content:
+                    return content.strip()
+            else:
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=[RESUME_SUMMARY_PROMPT, f"Candidate Resume Text:\n{resume_text}"]
+                )
+                if response.text:
+                    return response.text.strip()
+            raise ValueError("Empty response returned from LLM API.")
         except Exception as e:
             if ("503" in str(e) or "429" in str(e) or "rate_limit" in str(e).lower()) and attempt < max_retries - 1:
                 sleep_time = (attempt + 1) * 4
-                logger.warning(f"Transient Groq API error during summary (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                logger.warning(f"Transient LLM API error during summary (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
                 time.sleep(sleep_time)
                 continue
-            logger.error(f"Groq resume summary generation failed: {e}")
+            logger.error(f"LLM resume summary generation failed: {e}")
             return f"Failed to generate summary: {e}"
 
 def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
@@ -94,21 +114,32 @@ def analyze_resume_vs_jd(resume_text: str, jd_text: str) -> dict:
     max_retries = 5
     for attempt in range(max_retries):
         try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "user", "content": formatted_prompt}
-                ],
-                response_format={"type": "json_object"}
-            )
-            content = response.choices[0].message.content
-            if content:
-                return clean_json_response(content)
-            raise ValueError("Empty response returned from Groq API.")
+            if use_groq:
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "user", "content": formatted_prompt}
+                    ],
+                    response_format={"type": "json_object"}
+                )
+                content = response.choices[0].message.content
+                if content:
+                    return clean_json_response(content)
+            else:
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=formatted_prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                    )
+                )
+                if response.text:
+                    return clean_json_response(response.text)
+            raise ValueError("Empty response returned from LLM API.")
         except Exception as e:
             if ("503" in str(e) or "429" in str(e) or "rate_limit" in str(e).lower()) and attempt < max_retries - 1:
                 sleep_time = (attempt + 1) * 4
-                logger.warning(f"Transient Groq API error during analysis (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                logger.warning(f"Transient LLM API error during analysis (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
                 time.sleep(sleep_time)
                 continue
             logger.error(f"Resume vs JD comparison failed: {e}")
@@ -132,21 +163,32 @@ def generate_interview_questions(resume_text: str, jd_text: str) -> dict:
     max_retries = 5
     for attempt in range(max_retries):
         try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "user", "content": formatted_prompt}
-                ],
-                response_format={"type": "json_object"}
-            )
-            content = response.choices[0].message.content
-            if content:
-                return clean_json_response(content)
-            raise ValueError("Empty response returned from Groq API.")
+            if use_groq:
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "user", "content": formatted_prompt}
+                    ],
+                    response_format={"type": "json_object"}
+                )
+                content = response.choices[0].message.content
+                if content:
+                    return clean_json_response(content)
+            else:
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=formatted_prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                    )
+                )
+                if response.text:
+                    return clean_json_response(response.text)
+            raise ValueError("Empty response returned from LLM API.")
         except Exception as e:
             if ("503" in str(e) or "429" in str(e) or "rate_limit" in str(e).lower()) and attempt < max_retries - 1:
                 sleep_time = (attempt + 1) * 4
-                logger.warning(f"Transient Groq API error during questions (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
+                logger.warning(f"Transient LLM API error during questions (attempt {attempt+1}/{max_retries}): {e}. Retrying in {sleep_time} seconds...")
                 time.sleep(sleep_time)
                 continue
             logger.error(f"Interview question generation failed: {e}")

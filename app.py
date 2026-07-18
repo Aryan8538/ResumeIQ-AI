@@ -17,7 +17,8 @@ from core.extractor import extract_resume_info
 from services.gemini_service import (
     generate_resume_summary,
     analyze_resume_vs_jd,
-    generate_interview_questions
+    generate_interview_questions,
+    use_groq
 )
 from rag.chunker import chunk_text
 from rag.vector_store import reset_db, index_document_chunks
@@ -26,6 +27,8 @@ from rag.chatbot import generate_rag_response
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+model_name = "Llama 3.3 (Groq)" if use_groq else "Gemini 2.0 Flash"
 
 # Premium style injections
 def inject_custom_styles():
@@ -375,7 +378,7 @@ def main():
                         parsed_profile = extract_resume_info(resume_text)
                         st.session_state.parsed_data = parsed_profile
                         
-                    with st.spinner("Calling Llama 3.3 (Groq) for analysis..."):
+                    with st.spinner(f"Calling {model_name} for analysis..."):
                         with concurrent.futures.ThreadPoolExecutor() as executor:
                             # Submit Gemini API calls concurrently
                             future_summary = executor.submit(generate_resume_summary, resume_text)
@@ -420,7 +423,7 @@ def main():
                                 
         st.markdown("---")
         st.markdown("**Version**: ResumeIQ AI")
-        st.markdown("**Model**: Llama 3.3 (Groq)")
+        st.markdown(f"**Model**: {model_name}")
 
     # Main dashboard view
     if not st.session_state.processed:
