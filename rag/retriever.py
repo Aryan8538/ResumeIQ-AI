@@ -25,7 +25,7 @@ def retrieve_relevant_chunks(query: str, n_results: int = 5) -> list[dict]:
     try:
         # 1. Embed query
         query_vector = get_single_embedding(query)
-        if not query_vector:
+        if query_vector is None or len(query_vector) == 0:
             logger.warning("Empty query embedding generated.")
             return []
             

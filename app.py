@@ -375,7 +375,7 @@ def main():
                         parsed_profile = extract_resume_info(resume_text)
                         st.session_state.parsed_data = parsed_profile
                         
-                    with st.spinner("Calling Gemini 2.0 Flash for analysis..."):
+                    with st.spinner("Calling Llama 3.3 (Groq) for analysis..."):
                         with concurrent.futures.ThreadPoolExecutor() as executor:
                             # Submit Gemini API calls concurrently
                             future_summary = executor.submit(generate_resume_summary, resume_text)
@@ -420,7 +420,7 @@ def main():
                                 
         st.markdown("---")
         st.markdown("**Version**: ResumeIQ AI")
-        st.markdown("**Model**: Gemini 2.0 Flash")
+        st.markdown("**Model**: Llama 3.3 (Groq)")
 
     # Main dashboard view
     if not st.session_state.processed:
