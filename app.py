@@ -424,6 +424,8 @@ def main():
         st.markdown("---")
         st.markdown("**Version**: ResumeIQ AI")
         st.markdown(f"**Model**: {model_name}")
+        if not use_groq:
+            st.sidebar.error("⚠️ GROQ_API_KEY is not configured in your Streamlit Secrets! App is running on rate-limited Gemini fallback.")
 
     # Main dashboard view
     if not st.session_state.processed:
