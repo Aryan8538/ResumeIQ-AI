@@ -112,3 +112,37 @@ streamlit run app.py
    - **Candidate Profile Tab**: View structured contacts, professional details, and tech/soft skills.
    - **Screen & Matching Tab**: Review the Match Percentage, Recommendation badge, strengths, weaknesses, and categorized interview questions.
    - **AI Recruiter Chat Tab**: Chat with the copilot. Click **"Grounding Sources"** below chatbot answers to audit the exact parts of the resume or JD that backed up the response.
+
+---
+
+## 📸 Application Screenshots
+
+### Welcome Dashboard
+
+Displays the initial application dashboard where recruiters can upload candidate resumes and job descriptions to initialize RAG.
+
+![Welcome Dashboard](screenshots/welcome_dashboard.png)
+
+---
+
+### Candidate Profile
+
+Shows the parsed contact information alongside a comprehensive AI-generated candidate professional summary and key areas of expertise.
+
+![Candidate Profile](screenshots/candidate_profile.png)
+
+---
+
+### Screen & Matching
+
+Displays the candidate match score circular progress gauge, hiring suitability recommendation, and a detailed matching explanation.
+
+![Screen & Matching](screenshots/screen_matching.png)
+
+---
+
+### AI Recruiter Chat
+
+An interactive recruiter screening chatbot grounded in the candidate's uploaded files, displaying collapsible citation links for RAG transparency.
+
+![AI Recruiter Chat](screenshots/recruiter_chat.png)
